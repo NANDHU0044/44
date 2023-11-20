@@ -1,0 +1,101 @@
+clc;
+clear;close all;
+x=randi([0,1],1000,1);
+L=length(x);
+Tb=0.001;
+nb = 100; % oversample
+pulse = [];
+a1=ones(1,100);
+a2=zeros(1,100);
+sig=[];
+for i = 1:L
+if x(i) == 1
+sig = [a1];
+else
+sig = [a2];
+end
+pulse = [pulse sig];
+end
+t1 = Tb/nb:Tb/nb:nb*L*(Tb/nb); % Time period
+subplot(311);
+plot(t1,pulse);
+xlabel("time");ylabel("amplitude");
+title("digital input");
+%UNIPOLAR NRZ
+for j = 0:L-1
+if x(j+1) == 1
+Y(j*nb+1:(j+1)*nb) = 1;
+else
+Y(j*nb+1:(j+1)*nb) = 0;
+end
+end
+subplot(312);
+plot(t1,Y);
+title("Unipolar NRZ");
+%unipolar RZ
+uprz=[];
+for i = 1:1:L
+if x(i) == 1
+s = [ones(1,50) zeros(1,50)];
+else
+s = zeros(1,100);
+end
+uprz = [uprz s];
+end
+subplot(313);
+plot(t1,uprz);
+title("Unipolar RZ");
+xlabel("time");ylabel("amplitude");
+%polar Nrz
+si=[];
+pnrz=[];
+for i = 1:1:L
+if x(i) == 1
+si = ones(1,100);
+else
+si = -1*ones(1,100);
+end
+pnrz = [pnrz si];
+end
+figure;
+subplot(311);
+plot(t1,pnrz);
+title("polar NRZ");xlabel("time");ylabel("amplitude");
+%polar RZ
+prz=[];
+for i=1:1:L
+if x(i)==1
+sign=[ones(1,50) zeros(1,50)];
+else
+sign=[-1*ones(1,50) zeros(1,50)];
+end
+prz=[prz sign];
+end
+subplot(312);
+plot(t1,prz);
+title("polar RZ");xlabel("time");ylabel("amplitude");
+man=[];
+for i=1:1:L
+if x(i)==1
+signal=[1*ones(1,50) -1*ones(1,50)];
+else
+signal=[-1*ones(1,50) 1*ones(1,50)];
+end
+man=[man signal];
+end
+subplot(313);
+plot(t1,man);
+title("manchester");
+xlabel("time");ylabel("amplitude");
+figure;
+subplot(311);
+pspectrum(Y,100/Tb);
+subplot(312);
+pspectrum(uprz,100/Tb);
+subplot(313);
+pspectrum(pnrz,100/Tb);
+figure;
+subplot(311);
+pspectrum(prz,100/Tb);
+subplot(312);
+pspectrum(man,100/Tb);

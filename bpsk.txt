@@ -1,0 +1,33 @@
+M = 2;
+x = randi([0 M-1],10e5,1);
+y = [];
+for i = 1:length(x)
+    if x(i)==1
+        y(i)=-1;
+    else 
+        y(i) = 1;
+    end
+end
+z =pskmod(x,M);
+snr = 0:1:30;
+br = zeros(1,length(snr));
+for j = 1:length(snr)
+    n = awgn(z,snr(j));
+    
+    m = [];
+     for i = 1:length(x)
+         if real (n(i))>0
+             m(i) = 0;
+         else
+             m(i) = 1;
+         end
+     end
+     for i = 1:length(x)
+         if x(i)~=m(i)
+             br(j) = br(j)+1;
+         end
+     end
+end
+ber = br/length(x);
+semilogy(snr,ber);
+scatterplot(n);

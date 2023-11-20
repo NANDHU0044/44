@@ -1,0 +1,40 @@
+clc;clear; close all;
+n=7; k=4;
+x=randi ([0,1],10^6,1);
+X=reshape(x, length (x)/4,4);
+I=eye(k);
+P=[1,1,0;0,1,1;1,1,1;1,0,1];
+Pt=transpose(P);
+G=[P I];
+C=mod (X*G,2);
+M=2;
+bl=pskmod (x,M);
+b=pskmod (C,M);
+snr =0:1:100;
+br = zeros(1, length(snr));
+brl = zeros(1, length(snr));
+for j=1:length(snr)
+d=awgn(b,snr(j),"measured");
+dl=awgn (bl, snr(j), "measured");
+m=pskdemod (d,M);
+m1=pskdemod (dl,M);
+H=[eye(n-k) Pt];
+Ht=transpose(H);
+S=mod (m*Ht, 2);
+t=syndtable (H);
+s=bit2int (S',3, true);
+row=t(s+1,:);
+r=mod(row+m,2);
+msg=r(:,4: end);
+br(j)=biterr(X,msg);
+br1(j)=biterr(x,m1);
+end
+ber1=br1/length(x);
+ber = br/length(x);
+semilogy (snr,ber)
+hold on
+semilogy (snr,ber1);
+legend ("HammingBpsk", 'Bpsk')
+grid on
+xlabel("SNR (in dB)"); ylabel("Bit Error Rate")
+title("BER vs SNR");

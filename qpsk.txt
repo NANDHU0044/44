@@ -1,0 +1,39 @@
+M = 4;
+x = randi([0 M-1],10e3,1);
+y = [];
+for i = 1:length(x)
+    if x(i)==0
+        y(i) = (1+1i)*1/sqrt(2);
+    elseif x(i)==1
+        y(i) = (-1+1i)*1/sqrt(2);
+    elseif x(i)==2
+        y(i) = (-1-1i)*1/sqrt(2);
+    elseif x(i)==3
+        y(i) = (1-1i)*1/sqrt(2);
+    end
+end
+snr = 0:1:30;
+br = zeros(1,length(snr));
+for j = 1:length(snr)
+    n = awgn(y,snr(j));
+    m = [];
+    for i = 1:length(x)
+        if real(n(i))>0 && imag (n(i))>0
+            m(i) = 0;
+        elseif real(n(i))<0 && imag (n(i))>0
+            m(i) = 1;
+        elseif real(n(i))<0 && imag (n(i))<0
+            m(i) = 2;
+        elseif real(n(i))>0 && imag (n(i))<0
+            m(i) = 3;
+        end
+    end
+    for i = 1:length(x)
+        if x(i)~=m(i)
+            br(j) = br(j)+1;
+        end
+    end
+end
+ber = br/length(x);
+semilogy(snr,ber)
+scatterplot(n)
